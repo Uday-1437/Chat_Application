@@ -48,7 +48,7 @@
             .photos {
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
                 margin-top: 15px;
 
                 .photoItem {
@@ -71,7 +71,7 @@
                         span {
                             font-size: 12px;
                             color: lightgray;
-                            font-weight: 300;
+                            font-weight: 200;
                         }
                     }
 

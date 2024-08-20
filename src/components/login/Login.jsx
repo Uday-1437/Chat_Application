@@ -6,7 +6,6 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import { auth, db } from "../../lib/firebase";
 import { doc, setDoc } from 'firebase/firestore';
 import upload from "../../lib/upload";
-import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
     const [avatar, setAvatar] = useState({
@@ -15,7 +14,6 @@ export default function Login() {
     });
 
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
     const handleAvatar = (e) => {
         if (e.target.files[0]) {
@@ -60,7 +58,6 @@ export default function Login() {
             setLoading(false);
         }
     }; 
-
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -70,7 +67,6 @@ export default function Login() {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            navigate('/chat');
             toast.success("Logged in successfully!");
         } catch (err) {
             console.log(err);
@@ -79,7 +75,6 @@ export default function Login() {
             setLoading(false);
         }
     }; 
-
     return (
         <div className="login">
             <div className="item">

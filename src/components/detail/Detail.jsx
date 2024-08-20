@@ -1,3 +1,4 @@
+import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import "./detail.css";
@@ -11,6 +12,7 @@ import { useUserStore } from '../../lib/userStore';
 import { updateDoc, doc, arrayRemove, arrayUnion } from 'firebase/firestore';
 
 export default function Detail() {
+  const [showChat, setShowChat] = useState(true); 
   const navigate = useNavigate();
   const { user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } = useChatStore();
   const { currentUser } = useUserStore();
@@ -21,87 +23,94 @@ export default function Detail() {
     const userDocRef = doc(db, "users", currentUser.id);
 
     try {
-      if (isReceiverBlocked) {
-        await updateDoc(userDocRef, {
-          blocked: arrayRemove(user.id)
-        });
-      } else {
-        await updateDoc(userDocRef, {
-          blocked: arrayUnion(user.id)
-        });
-      }
-      changeBlock(); // Toggle block state in Zustand store
+      await updateDoc(userDocRef, {
+        blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id)
+      });
+      changeBlock();
+      setShowChat(false); 
     } catch (error) {
-      console.error("Error updating block status: ", error);
+      console.log(error);
     }
+  };
+
+  const handleShowChat = () => {
+    setShowChat(true); 
   };
 
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      navigate('/login');
+      navigate('/login'); 
     } catch (error) {
-      console.error("Logout failed", error);
+      console.log("Logout failed", error);
     }
   };
 
   return (
     <div className='detail'>
-      <div className="user">
-        <img src={user?.avatar || avatar} alt="User Avatar" />
-        <h2>{user?.username}</h2>
-        <p>Lorem ipsum dolor sit</p>
-      </div>
-      <div className="info">
-        <div className="option">
-          <div className="title">
-            <span>Chat Settings</span>
-            <img src={arrowUp} alt="Arrow Up" />
+      {showChat && (
+        <>
+          <div className="user">
+            <img src={user?.avatar || avatar} alt="User Avatar" />
+            <h2>{user?.username}</h2>
+            <p>Lorem ipsum dolor sit</p>
           </div>
-        </div>
-        <div className="option">
-          <div className="title">
-            <span>Privacy & Help</span>
-            <img src={arrowUp} alt="Arrow Up" />
-          </div>
-        </div>
-        <div className="option">
-          <div className="title">
-            <span>Shared Photos</span>
-            <img src={arrowDown} alt="Arrow Down" />
-          </div>
-          <div className="photos">
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mEIWZjRFdiO4YIkq790lTaNzTtCH6DcwrQ&usqp=CAU" alt="Shared Photo" />
-                <span>photo_2024_07</span>
+          <div className="info">
+            <div className="option">
+              <div className="title">
+                <span>Chat Settings</span>
+                <img src={arrowUp} alt="Arrow Up" />
               </div>
-              <img className='icon' src={download} alt="Download Icon" />
             </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mEIWZjRFdiO4YIkq790lTaNzTtCH6DcwrQ&usqp=CAU" alt="Shared Photo" />
-                <span>photo_2024_07</span>
+            <div className="option">
+              <div className="title">
+                <span>Privacy & Help</span>
+                <img src={arrowUp} alt="Arrow Up" />
               </div>
-              <img className='icon' src={download} alt="Download Icon" />
             </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mEIWZjRFdiO4YIkq790lTaNzTtCH6DcwrQ&usqp=CAU" alt="Shared Photo" />
-                <span>photo_2024_07</span>
+            <div className="option">
+              <div className="title">
+                <span>Shared Photos</span>
+                <img src={arrowDown} alt="Arrow Down" />
               </div>
-              <img className='icon' src={download} alt="Download Icon" />
+              <div className="photos">
+                <div className="photoItem">
+                  <div className="photoDetail">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mEIWZjRFdiO4YIkq790lTaNzTtCH6DcwrQ&usqp=CAU" alt="Shared Photo" />
+                    <span>photo_2024_07</span>
+                  </div>
+                  <img className='icon' src={download} alt="Download Icon" />
+                </div>
+                <div className="photoItem">
+                  <div className="photoDetail">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mEIWZjRFdiO4YIkq790lTaNzTtCH6DcwrQ&usqp=CAU" alt="Shared Photo" />
+                    <span>photo_2024_07</span>
+                  </div>
+                  <img className='icon' src={download} alt="Download Icon" />
+                </div>
+                <div className="photoItem">
+                  <div className="photoDetail">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mEIWZjRFdiO4YIkq790lTaNzTtCH6DcwrQ&usqp=CAU" alt="Shared Photo" />
+                    <span>photo_2024_07</span>
+                  </div>
+                  <img className='icon' src={download} alt="Download Icon" />
+                </div>
+              </div>
             </div>
-
+            <div className="option">
+              <div className="title">
+                <span>Shared Files</span>
+                <img src={arrowUp} alt="Arrow Up" />
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="option">
-          <div className="title">
-            <span>Shared Files</span>
-            <img src={arrowUp} alt="Arrow Up" />
-          </div>
-        </div>
-      </div>
+        </>
+      )}
+      {!showChat && isReceiverBlocked && (
+        <button className='showChat' onClick={handleShowChat}>
+          Show Chat
+        </button>
+      )}
       <button className='block' onClick={handleBlock}>
         {isCurrentUserBlocked ? "You are Blocked!" : isReceiverBlocked ? "User Blocked" : "Block user"}
       </button>

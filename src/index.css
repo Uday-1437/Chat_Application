@@ -6,7 +6,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #2e003e, #3b006e);
+  background: linear-gradient(135deg, #1f005c, #68027e); /* Updated background */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,7 +17,7 @@ body {
 .container {
   width: 90vw;
   height: 90vh;
-  background: linear-gradient(135deg, rgba(38, 38, 61, 0.8), rgba(50, 50, 85, 0.8));
+  background: linear-gradient(135deg, rgba(25, 25, 45, 0.8), rgba(70, 70, 110, 0.8)); /* Updated container background */
   backdrop-filter: blur(15px) saturate(150%);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -29,7 +29,7 @@ body {
   padding: 50px;
   font-size: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #5e2a73, #3f1c5b);
+  background: linear-gradient(135deg, #482880, #290a4b); /* Updated loading background */
   color: white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }

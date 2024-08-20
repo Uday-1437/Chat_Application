@@ -20,7 +20,7 @@ export default function Chat() {
   const [chat, setChat] = useState(null);
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
-  const { chatId, user,isCurrentUserBlocked, isReceiverBlocked, } = useChatStore();
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } = useChatStore();
   const { currentUser } = useUserStore();
 
   const endRef = useRef(null);
@@ -53,62 +53,72 @@ export default function Chat() {
     if (image) {
       const storage = getStorage();
       const storageRef = ref(storage, `images/${image.name}`);
-      try {
-        await uploadBytes(storageRef, image);
-        const downloadURL = await getDownloadURL(storageRef);
-        return downloadURL;
-      } catch (error) {
-        console.error("Error uploading image: ", error);
-      }
+      await uploadBytes(storageRef, image);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
     }
     return null;
   };
 
   const handleSend = async () => {
-    if (text.trim() === "" && !image) return; // Check if text is not empty or image is selected
+    if (text.trim() === "" && !image) return;
 
-    try {
-      let imageURL = null;
-      if (image) {
-        imageURL = await handleUploadImage();
-      }
+    let imageURL = null;
+    if (image) {
+      imageURL = await handleUploadImage();
+    }
 
-      await updateDoc(doc(db, "chats", chatId), {
-        messages: arrayUnion({
-          senderId: currentUser.id,
-          text,
-          img: imageURL, // Include image URL
-          createdAt: new Date(),
-        }),
-      });
+    await updateDoc(doc(db, "chats", chatId), {
+      messages: arrayUnion({
+        senderId: currentUser.id,
+        text,
+        img: imageURL,
+        createdAt: new Date(),
+      }),
+    });
 
-      const userIDs = [currentUser.id, user.id];
-      
-      userIDs.forEach(async (id) => {
-        const userChatsRef = doc(db, "userChats", id);
-        const userChatsSnapshot = await getDoc(userChatsRef);
+    const userIDs = [currentUser.id, user.id];
 
-        if (userChatsSnapshot.exists()) {
-          const userChatsData = userChatsSnapshot.data();
-          const chatIndex = userChatsData.chats.findIndex(
-            (c) => c.chatId === chatId
-          );
+    for (const id of userIDs) {
+      const userChatsRef = doc(db, "userChats", id);
+      const userChatsSnapshot = await getDoc(userChatsRef);
+      if (userChatsSnapshot.exists()) {
+        const userChatsData = userChatsSnapshot.data();
+        const chatIndex = userChatsData.chats.findIndex(
+          (c) => c.chatId === chatId
+        );
+
+        if (chatIndex === -1) {
+          userChatsData.chats.push({
+            chatId,
+            lastMessage: text,
+            isSeen: id === currentUser.id ? true : false,
+            updatedAt: Date.now(),
+          });
+        } else {
           userChatsData.chats[chatIndex].lastMessage = text;
           userChatsData.chats[chatIndex].isSeen = id === currentUser.id ? true : false;
           userChatsData.chats[chatIndex].updatedAt = Date.now();
-
-          await updateDoc(userChatsRef, {
-            chats: userChatsData.chats,
-          });
         }
-      });
 
-      setText(""); 
-      setImage(null); 
-
-    } catch (error) {
-      console.log(error);
+        await updateDoc(userChatsRef, {
+          chats: userChatsData.chats,
+        });
+      }
     }
+
+    setText("");
+    setImage(null);
+  };
+
+  const formatTime = (timestamp) => {
+    const date = timestamp.toDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    return `${formattedHours}:${formattedMinutes} ${ampm}`;
   };
 
   return (
@@ -133,7 +143,7 @@ export default function Chat() {
             <div className="texts">
               {message.img && <img src={message.img} alt='message' />}
               {message.text && <p>{message.text}</p>}
-              {/* <span>1 min ago</span> */}
+              <span>{formatTime(message.createdAt)}</span>
             </div>
           </div>
         ))}
@@ -156,10 +166,10 @@ export default function Chat() {
         </div>
         <input
           type="text"
-          placeholder={(isCurrentUserBlocked || isReceiverBlocked)? "You cannont send a message": 'Type a message...'}
+          placeholder={(isCurrentUserBlocked || isReceiverBlocked) ? "You cannot send a message" : 'Type a message...'}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled= {isCurrentUserBlocked || isReceiverBlocked}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
         <div className="emoji">
           <img
@@ -173,7 +183,7 @@ export default function Chat() {
             </div>
           )}
         </div>
-        <button className="sendButton" onClick={handleSend} disabled= {isCurrentUserBlocked || isReceiverBlocked}>Send</button>
+        <button className="sendButton" onClick={handleSend} disabled={isCurrentUserBlocked || isReceiverBlocked}>Send</button>
       </div>
     </div>
   );

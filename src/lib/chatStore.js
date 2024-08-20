@@ -10,33 +10,18 @@ export const useChatStore = create((set) => ({
         const currentUser = useUserStore.getState().currentUser;
 
         if (!currentUser || !user) {
-            console.error('Current user or user is not defined');
+            console.error('Current user or chat user is not defined');
             return;
         }
 
-        if (user.blocked.includes(currentUser.id)) {
-            return set({
-                chatId,
-                user: null,
-                isCurrentUserBlocked: true,
-                isCurrentReceiverBlocked: false,
-            });
-        }
+        const isUserBlocked = user.blocked?.includes(currentUser.id) || false;
+        const isCurrentUserBlocked = currentUser.blocked?.includes(user.id) || false;
 
-        if (currentUser.blocked.includes(user.id)) {
-            return set({
-                chatId,
-                user,
-                isCurrentUserBlocked: false,
-                isCurrentReceiverBlocked: true,
-            });
-        }
-
-        return set({
+        set({
             chatId,
-            user,
-            isCurrentUserBlocked: false,
-            isCurrentReceiverBlocked: false,
+            user: isUserBlocked ? null : user,
+            isCurrentUserBlocked,
+            isCurrentReceiverBlocked: isCurrentUserBlocked,
         });
     },
     changeBlock: () => {

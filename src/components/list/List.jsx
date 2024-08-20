@@ -1,4 +1,4 @@
-import React from 'react'
+
 import "./list.css"
 import ChatList from './chatList/ChatList'
 import UserInfo from './userInfo/UserInfo'
