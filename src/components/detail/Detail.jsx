@@ -12,7 +12,7 @@ import { updateDoc, doc, arrayRemove, arrayUnion } from 'firebase/firestore';
 
 export default function Detail() {
   const navigate = useNavigate();
-  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } = useChatStore();
+  const { user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } = useChatStore();
   const { currentUser } = useUserStore();
 
   const handleBlock = async () => {

@@ -20,29 +20,29 @@ export default function ChatList() {
 
   useEffect(() => {
     if (!currentUser) return;
-
+  
     const unSub = onSnapshot(doc(db, "userChats", currentUser.id), async (res) => {
       if (res.exists()) {
         const items = res.data()?.chats || [];
-
+  
         const promises = items.map(async (item) => {
           const userDocRef = doc(db, "users", item.receiverId);
           const userDocSnap = await getDoc(userDocRef);
           const user = userDocSnap.exists() ? userDocSnap.data() : {};
-
+  
           return { ...item, user };
         });
-
+  
         const chatData = await Promise.all(promises);
         setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
       }
     });
-
+  
     return () => {
       unSub();
     };
-  }, [currentUser.id]);
-
+  }, [currentUser]);
+  
   const handleSelect = async (chat) => {
     const updatedChats = chats.map((item) => {
       if (item.chatId === chat.chatId) {
