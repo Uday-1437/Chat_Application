@@ -6,7 +6,7 @@ import { db } from "../../../../lib/firebase";
 import { useUserStore } from "../../../../lib/userStore";
 import { toast } from 'react-toastify';
 
-export default function AddUser() {
+export default function AddUser({ onClose }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const { currentUser } = useUserStore();
@@ -92,6 +92,7 @@ export default function AddUser() {
 
             toast.success("User added and chat created");
             setUser(null);
+            if (onClose) onClose(); // Call the onClose prop to hide the AddUser container
         } catch (err) {
             console.error('Error adding user:', err);
             toast.error("Error adding user");

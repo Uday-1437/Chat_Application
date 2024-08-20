@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import "./detail.css";
 import avatar from '../../Assets/avatar.png';
@@ -12,7 +11,7 @@ import { useUserStore } from '../../lib/userStore';
 import { updateDoc, doc, arrayRemove, arrayUnion } from 'firebase/firestore';
 
 export default function Detail() {
-  const [showChat, setShowChat] = useState(true); 
+  const [blocking, setBlocking] = useState(false);
   const navigate = useNavigate();
   const { user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } = useChatStore();
   const { currentUser } = useUserStore();
@@ -23,18 +22,16 @@ export default function Detail() {
     const userDocRef = doc(db, "users", currentUser.id);
 
     try {
+      setBlocking(true);
       await updateDoc(userDocRef, {
         blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id)
       });
       changeBlock();
-      setShowChat(false); 
     } catch (error) {
       console.log(error);
+    } finally {
+      setBlocking(false);
     }
-  };
-
-  const handleShowChat = () => {
-    setShowChat(true); 
   };
 
   const handleLogout = async () => {
@@ -48,7 +45,7 @@ export default function Detail() {
 
   return (
     <div className='detail'>
-      {showChat && (
+      {!blocking && (
         <>
           <div className="user">
             <img src={user?.avatar || avatar} alt="User Avatar" />
@@ -106,12 +103,7 @@ export default function Detail() {
           </div>
         </>
       )}
-      {!showChat && isReceiverBlocked && (
-        <button className='showChat' onClick={handleShowChat}>
-          Show Chat
-        </button>
-      )}
-      <button className='block' onClick={handleBlock}>
+      <button className='block' onClick={handleBlock} disabled={blocking}>
         {isCurrentUserBlocked ? "You are Blocked!" : isReceiverBlocked ? "User Blocked" : "Block user"}
       </button>
       <button className='logOut' onClick={handleLogout}>Log Out</button>

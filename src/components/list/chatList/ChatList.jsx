@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import './chatList.css';
 import search from '../../../Assets/search.png';
 import plus from '../../../Assets/plus.png';
@@ -19,9 +19,7 @@ export default function ChatList() {
   const { changeChat } = useChatStore();
 
   useEffect(() => {
-    if (!currentUser) return;
-
-    const unSub = onSnapshot(doc(db, "userchats", currentUser.id), async (res) => {
+    const unSub = onSnapshot(doc(db, "userChats", currentUser.id), async (res) => {
       if (res.exists()) {
         const items = res.data()?.chats || [];
 
@@ -41,7 +39,7 @@ export default function ChatList() {
     return () => {
       unSub();
     };
-  }, [currentUser]);
+  }, [currentUser.id]);
 
   const handleSelect = async (chat) => {
     const updatedChats = chats.map((item) => {
@@ -63,6 +61,10 @@ export default function ChatList() {
   const filteredChats = chats.filter((c) => 
     c.user?.username?.toLowerCase().includes(input.toLowerCase())
   );
+
+  const handleAddUserClose = () => {
+    setAddMode(false);
+  };
 
   return (
     <div className='chatList'>
@@ -103,7 +105,7 @@ export default function ChatList() {
           </div>
         </div>
       ))}
-      {addMode && <AddUser />}
+      {addMode && <AddUser onClose={handleAddUserClose} />}
     </div>
   );
 }
