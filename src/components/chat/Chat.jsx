@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import "./chat.css";
 import avatar from '../../Assets/avatar.png';
 import phone from '../../Assets/phone.png';
@@ -156,7 +156,7 @@ export default function Chat() {
         </div>
         <input
           type="text"
-          placeholder={(isCurrentUserBlocked || isReceiverBlocked)? "You cannont send a message" : 'Type a message...'}
+          placeholder={(isCurrentUserBlocked || isReceiverBlocked)? "You cannont send a message": 'Type a message...'}
           value={text}
           onChange={(e) => setText(e.target.value)}
           disabled= {isCurrentUserBlocked || isReceiverBlocked}

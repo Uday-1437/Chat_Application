@@ -1,12 +1,12 @@
 import './addUser.css';
 import avatar from "../../../../Assets/avatar.png";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { collection, query, where, getDocs, doc, setDoc, updateDoc, serverTimestamp, arrayUnion, getDoc } from "firebase/firestore";
 import { db } from "../../../../lib/firebase";
 import { useUserStore } from "../../../../lib/userStore";
 import { toast } from 'react-toastify';
 
-export default function AddUser({ onClose }) {
+export default function AddUser() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const { currentUser } = useUserStore();
@@ -92,7 +92,6 @@ export default function AddUser({ onClose }) {
 
             toast.success("User added and chat created");
             setUser(null);
-            if (onClose) onClose(); 
         } catch (err) {
             console.error('Error adding user:', err);
             toast.error("Error adding user");

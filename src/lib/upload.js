@@ -1,5 +1,4 @@
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import {storage} from "./firebase"
 
 const upload = (file) => {
     const storage = getStorage();
@@ -21,7 +20,7 @@ const upload = (file) => {
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                     console.log('File available at', downloadURL);
-                    resolve(downloadURL); // Resolve with the download URL
+                    resolve(downloadURL); 
                 });
             }
         );

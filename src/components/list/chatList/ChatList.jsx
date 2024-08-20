@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './chatList.css';
 import search from '../../../Assets/search.png';
 import plus from '../../../Assets/plus.png';
@@ -19,18 +19,20 @@ export default function ChatList() {
   const { changeChat } = useChatStore();
 
   useEffect(() => {
-    if (!currentUser) return; 
-    
-    const userChatsDocRef = doc(db, "userChats", currentUser.id);
-    const unSub = onSnapshot(userChatsDocRef, async (res) => {
+    if (!currentUser) return;
+
+    const unSub = onSnapshot(doc(db, "userChats", currentUser.id), async (res) => {
       if (res.exists()) {
         const items = res.data()?.chats || [];
+
         const promises = items.map(async (item) => {
           const userDocRef = doc(db, "users", item.receiverId);
           const userDocSnap = await getDoc(userDocRef);
           const user = userDocSnap.exists() ? userDocSnap.data() : {};
+
           return { ...item, user };
         });
+
         const chatData = await Promise.all(promises);
         setChats(chatData.sort((a, b) => b.updatedAt - a.updatedAt));
       }
@@ -39,7 +41,7 @@ export default function ChatList() {
     return () => {
       unSub();
     };
-  }, [currentUser]); // Add dependencies
+  }, [currentUser.id]);
 
   const handleSelect = async (chat) => {
     const updatedChats = chats.map((item) => {
@@ -58,24 +60,20 @@ export default function ChatList() {
     }
   };
 
-  const filteredChats = chats.filter((c) =>
+  const filteredChats = chats.filter((c) => 
     c.user?.username?.toLowerCase().includes(input.toLowerCase())
   );
-
-  const handleAddUserClose = () => {
-    setAddMode(false);
-  };
 
   return (
     <div className='chatList'>
       <div className="search">
         <div className="searchBar">
           <img src={search} alt="Search Icon" />
-          <input
-            type="text"
-            placeholder='Search'
+          <input 
+            type="text" 
+            placeholder='Search' 
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value)} 
           />
         </div>
         <img
@@ -86,26 +84,26 @@ export default function ChatList() {
         />
       </div>
       {filteredChats.map((chat, index) => (
-        <div
-          className="item"
-          key={`${chat.chatId}-${index}`}
+        <div 
+          className="item" 
+          key={`${chat.chatId}-${index}`} 
           onClick={() => handleSelect(chat)}
         >
-          <img
-            src={chat.user?.avatar || avatar}
-            alt={chat.user?.username || "User Avatar"}
+          <img 
+            src={chat.user?.avatar || avatar} 
+            alt={chat.user?.username || "User Avatar"} 
           />
           <div className="texts">
             <span>
-              {chat.user?.blocked?.includes(currentUser.id)
-                ? "User"
+              {chat.user?.blocked?.includes(currentUser.id) 
+                ? "User" 
                 : chat.user?.username || "Unknown"}
             </span>
             <p>{chat.lastMessage}</p>
           </div>
         </div>
       ))}
-      {addMode && <AddUser onClose={handleAddUserClose} />}
+      {addMode && <AddUser />}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import "./detail.css";
 import avatar from '../../Assets/avatar.png';
@@ -30,7 +30,7 @@ export default function Detail() {
           blocked: arrayUnion(user.id)
         });
       }
-      changeBlock(); 
+      changeBlock(); // Toggle block state in Zustand store
     } catch (error) {
       console.error("Error updating block status: ", error);
     }
@@ -92,6 +92,7 @@ export default function Detail() {
               </div>
               <img className='icon' src={download} alt="Download Icon" />
             </div>
+
           </div>
         </div>
         <div className="option">

@@ -70,7 +70,7 @@ export default function Login() {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            navigate('/chat'); 
+            navigate('/chat');
             toast.success("Logged in successfully!");
         } catch (err) {
             console.log(err);
